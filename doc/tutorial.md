@@ -988,12 +988,13 @@ The first variant of `when_all()` is variadic, i.e., the futures are given as se
 
 ```cpp
 #include <seastar/core/sleep.hh>
+#include <seastar/core/when_all.hh>
 
-future<> f() {
+seastar::future<> f() {
     using namespace std::chrono_literals;
-    future<int> slow_two = sleep(2s).then([] { return 2; });
-    return when_all(sleep(1s), std::move(slow_two), 
-                    make_ready_future<double>(3.5)
+    seastar::future<int> slow_two = seastar::sleep(2s).then([] { return 2; });
+    return when_all(seastar::sleep(1s), std::move(slow_two), 
+                    seastar::make_ready_future<double>(3.5)
            ).discard_result();
 }
 ```
@@ -1023,6 +1024,7 @@ The output of this program (which comes after two seconds) is `1, 2, 3.5`: the f
 One or more of the waited futures might resolve in an exception, but this does not change how `when_all()` works: It still waits for all the futures to resolve, each with either a value or an exception, and in the returned tuple some of the futures may contain an exception instead of a value. For example,
 
 ```cpp
+using namespace seastar;
 future<> f() {
     using namespace std::chrono_literals;
     future<> slow_success = sleep(1s);
