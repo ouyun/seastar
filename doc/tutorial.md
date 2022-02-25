@@ -1050,7 +1050,7 @@ future<> f() {
     using namespace std::chrono_literals;
     return when_all_succeed(sleep(1s), make_ready_future<int>(2),
                     make_ready_future<double>(3.5)
-            ).then([] (int i, double d) {
+            ).then_unpack([] (int i, double d) {
         std::cout << i << " " << d << "\n";
     });
 }
@@ -1060,9 +1060,9 @@ Note how the integer and double values held by the futures are conveniently pass
 
 ```cpp
 using namespace seastar;
-future<> f() {
+future<std::tuple<>> f() {
     using namespace std::chrono_literals;
-    return when_all_succeed(sleep(1s), sleep(2s), sleep(3s));
+    return when_all_succeed(sleep(1s), sleep(2s), sleep(3s));   // could not convert from ‘future<std::tuple<>>’ to ‘future<void>’ if f() return future<void>
 }
 ```
 
@@ -1071,6 +1071,32 @@ This example simply waits for 3 seconds (the maximum of 1, 2 and 3 seconds).
 An example of `when_all_succeed()` with an exception:
 
 ```cpp
+#include <boost/intrusive/list.hpp>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/lexical_cast.hpp>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <seastar/core/app-template.hh>
+#include <seastar/core/reactor.hh>
+#include <seastar/core/seastar.hh>
+#include <seastar/core/loop.hh>
+#include <seastar/core/timer-set.hh>
+#include <seastar/core/shared_ptr.hh>
+#include <seastar/core/stream.hh>
+#include <seastar/core/memory.hh>
+#include <seastar/core/units.hh>
+#include <seastar/core/distributed.hh>
+#include <seastar/core/vector-data-sink.hh>
+#include <seastar/core/bitops.hh>
+#include <seastar/core/slab.hh>
+#include <seastar/core/align.hh>
+#include <seastar/core/print.hh>
+#include <seastar/net/api.hh>
+#include <seastar/net/packet-data-source.hh>
+#include <seastar/util/std-compat.hh>
+#include <seastar/util/log.hh>
+#include <unistd.h>
 using namespace seastar;
 future<> f() {
     using namespace std::chrono_literals;
@@ -1079,7 +1105,7 @@ future<> f() {
             ).then([] (int i, double d) {
         std::cout << i << " " << d << "\n";
     }).handle_exception([] (std::exception_ptr e) {
-        std::cout << "exception: " << e << "\n";
+        std::cout << "oijen exception: " << e << "\n";   //without the above mass include statements(I have no time to filter out which lines are unavailable)
     });
 }
 ```

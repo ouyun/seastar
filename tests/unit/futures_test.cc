@@ -652,6 +652,7 @@ SEASTAR_TEST_CASE(test_when_any_variadic_ii)
 SEASTAR_TEST_CASE(test_map_reduce) {
     auto square = [] (long x) { return make_ready_future<long>(x*x); };
     long n = 1000;
+    std::cout << "test_map_reduce - make_counting_iterator\n";
     return map_reduce(boost::make_counting_iterator<long>(0), boost::make_counting_iterator<long>(n),
             square, long(0), std::plus<long>()).then([n] (auto result) {
         auto m = n - 1; // counting does not include upper bound

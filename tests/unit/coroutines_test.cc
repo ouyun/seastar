@@ -32,6 +32,7 @@ using namespace std::chrono_literals;
 #ifndef SEASTAR_COROUTINES_ENABLED
 
 SEASTAR_TEST_CASE(test_coroutines_not_compiled_in) {
+    std::cout << "entering test_coroutines_not_compiled_in()......\n";
     return make_ready_future<>();
 }
 
@@ -80,6 +81,7 @@ future<int> failing_coroutine2() noexcept {
 }
 
 SEASTAR_TEST_CASE(test_simple_coroutines) {
+    std::cout << "entering test_simple_coroutines()......\n";
     BOOST_REQUIRE_EQUAL(co_await old_fashioned_continuations(), 42);
     BOOST_REQUIRE_EQUAL(co_await simple_coroutine(), 53);
     BOOST_REQUIRE_EQUAL(ready_coroutine().get0(), 64);
@@ -105,6 +107,7 @@ SEASTAR_TEST_CASE(test_simple_coroutines) {
 }
 
 SEASTAR_TEST_CASE(test_abandond_coroutine) {
+    std::cout << "entering test_abandond_coroutine()......\n";
     std::optional<future<int>> f;
     {
         auto p1 = promise<>();
@@ -122,6 +125,7 @@ SEASTAR_TEST_CASE(test_abandond_coroutine) {
 }
 
 SEASTAR_TEST_CASE(test_scheduling_group) {
+    std::cout << "entering test_scheduling_group()......\n";
     auto other_sg = co_await create_scheduling_group("the other group", 10.f);
     std::exception_ptr ex;
 
@@ -168,6 +172,7 @@ SEASTAR_TEST_CASE(test_scheduling_group) {
 }
 
 SEASTAR_TEST_CASE(test_switch_to) {
+    std::cout << "entering test_switch_to()......\n";
     auto other_sg0 = co_await create_scheduling_group("other group 0", 10.f);
     auto other_sg1 = co_await create_scheduling_group("other group 1", 10.f);
     std::exception_ptr ex;
@@ -201,6 +206,7 @@ SEASTAR_TEST_CASE(test_switch_to) {
 }
 
 SEASTAR_TEST_CASE(test_preemption) {
+    std::cout << "entering test_preemption()......\n";
     bool x = false;
     unsigned preempted = 0;
     auto f = yield().then([&x] {
@@ -222,6 +228,7 @@ SEASTAR_TEST_CASE(test_preemption) {
 }
 
 SEASTAR_TEST_CASE(test_all_simple) {
+    std::cout << "entering test_all_simple()......\n";
     auto [a, b] = co_await coroutine::all(
         [] { return make_ready_future<int>(1); },
         [] { return make_ready_future<int>(2); }
@@ -231,6 +238,7 @@ SEASTAR_TEST_CASE(test_all_simple) {
 }
 
 SEASTAR_TEST_CASE(test_all_permutations) {
+    std::cout << "entering test_all_permutations()......\n";
     std::vector<std::chrono::milliseconds> delays = { 0ms, 0ms, 2ms, 2ms, 4ms, 6ms };
     auto make_delayed_future_returning_nr = [&] (int nr) {
         return [=] {
@@ -257,6 +265,7 @@ SEASTAR_TEST_CASE(test_all_permutations) {
 }
 
 SEASTAR_TEST_CASE(test_all_ready_exceptions) {
+    std::cout << "entering test_all_ready_exceptions()......\n";
     try {
         co_await coroutine::all(
             [] () -> future<> { throw 1; },
@@ -268,6 +277,7 @@ SEASTAR_TEST_CASE(test_all_ready_exceptions) {
 }
 
 SEASTAR_TEST_CASE(test_all_nonready_exceptions) {
+    std::cout << "entering test_all_nonready_exceptions()......\n";
     try {
         co_await coroutine::all(
             [] () -> future<> { 
@@ -285,6 +295,7 @@ SEASTAR_TEST_CASE(test_all_nonready_exceptions) {
 }
 
 SEASTAR_TEST_CASE(test_all_heterogeneous_types) {
+    std::cout << "entering test_all_heterogeneous_types()......\n";
     auto [a, b] = co_await coroutine::all(
         [] () -> future<int> { 
             co_await sleep(1ms);
@@ -303,6 +314,7 @@ SEASTAR_TEST_CASE(test_all_heterogeneous_types) {
 }
 
 SEASTAR_TEST_CASE(test_all_noncopyable_types) {
+    std::cout << "entering test_all_noncopyable_types()......\n";
     auto [a] = co_await coroutine::all(
         [] () -> future<std::unique_ptr<int>> {
             co_return std::make_unique<int>(6);
@@ -312,6 +324,7 @@ SEASTAR_TEST_CASE(test_all_noncopyable_types) {
 }
 
 SEASTAR_TEST_CASE(test_all_throw_in_input_func) {
+    std::cout << "entering test_all_throw_in_input_func()......\n";
     int nr_completed = 0;
     bool exception_seen = false;
     try {
@@ -339,6 +352,7 @@ SEASTAR_TEST_CASE(test_all_throw_in_input_func) {
 }
 
 SEASTAR_TEST_CASE(test_coroutine_exception) {
+    std::cout << "entering test_coroutine_exception()......\n";
     auto i_am_exceptional = [] () -> future<int> {
         co_return coroutine::exception(std::make_exception_ptr(std::runtime_error("threw")));
     };
@@ -359,6 +373,7 @@ SEASTAR_TEST_CASE(test_coroutine_exception) {
 }
 
 SEASTAR_TEST_CASE(test_maybe_yield) {
+    std::cout << "entering test_maybe_yield()......\n";
     int var = 0;
     bool done = false;
     auto spinner = [&] () -> future<> {
@@ -395,6 +410,7 @@ tl::generator<int> simple_generator(int max)
 
 SEASTAR_TEST_CASE(generator)
 {
+    std::cout << "entering generator()......\n";
     // test ability of seastar::parallel_for_each to deal with move-only views
     int accum = 0;
     co_await seastar::parallel_for_each(simple_generator(10), [&](int i) {
